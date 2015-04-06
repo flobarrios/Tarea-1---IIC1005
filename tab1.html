@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>Foursquare Checkins - Florencia Barrios</title>
+  	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.js'> </script>
+	<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css' rel='stylesheet' />
+
+	<link rel="stylesheet" type="text/css" href="diseno.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Poiret+One|Shadows+Into+Light|Coming+Soon' rel='stylesheet' type='text/css'>
+
+
+</head>
+<body>
+
+	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+	<div class="tabs">
+		<a href="tab1.html" > Informacion General </a>
+		<a href="tab2.html" > Explorar Usuarios </a>
+	</div>
+	<div class="tab-content">
+		<h1 class="title"> Resumen del Dataset</h1>
+		<div class="entry"> Numero de usuarios del dataset: 11326</div>
+		<div class="entry">Numero de ubicaciones del dataset: 187218</div>
+		<div class="entry">Numero de check-ins: 2290997</div>
+		<div class="entry">Promedio de amigos por usuario: 8.3</div>
+		<div class="entry">Promedio de check-ins por usuario: 202.3 </div>
+		<div class="entry">Promedio de check-ins por lugar: 12.2 </div>
+
+
+		<h1 class="title">Muestreo de Usuarios</h1>
+
+		<div id='map'></div>
+		<script>
+		L.mapbox.accessToken = 'pk.eyJ1IjoiZmJhcnJpb3MxIiwiYSI6Ik1KMVB5clUifQ.Z6_UiuwrpouEJW7ZEPwmdA';
+
+		var map = L.mapbox.map('map', 'fbarrios1.liae73l6')
+		.setView([30, 31],1)
+
+		 omnivore.csv('muestra_usuarios.csv').addTo(map);
+		
+		 </script>
+
+	</div>
+</body>
+</html>
+
+
+

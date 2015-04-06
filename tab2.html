@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Foursquare Checkins - Florencia Barrios</title>
+
+  	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.js'> </script>
+	<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css' rel='stylesheet' />
+
+	<link rel="stylesheet" type="text/css" href="diseno.css" media="screen" />
+	<link href='http://fonts.googleapis.com/css?family=Poiret+One|Shadows+Into+Light|Coming+Soon' rel='stylesheet' type='text/css'>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+</head>
+<body>
+
+	<div class="tabs">
+		<a href="tab1.html" > Informacion General </a>
+		<a href="tab2.html" > Explorar Usuarios </a>
+	</div>
+	<div class="tab-content">
+		<div>
+		<form>
+		<h3>Buscar Usuario con sus Amistades</h3>
+		<select id = "seleccion">
+			<option value="965" > 965</option>
+			<option value="8852"> 8852</option>
+			<option value="10590"> 10590</option>
+		</select>
+		<input  id = "lifecheck" type="checkbox"> Mostrar Amigos </input>
+
+		<div> 
+		<h3>Filtro Temporal</h3>
+		<p>Ingrese fechas de la forma: Ano-Mes-Dia (ej: 2015-04-05)</p>
+		Desde: <input type="text" id="fechai"><br>
+  		Hasta: <input type="text" id="fechaf"><br>
+  		</div>
+
+		<button onclick="funcion_click()" type="button">Buscar</button>
+		</form>
+		</div>
+	</div>
+		
+
+		<div id='map'></div>
+		<script>
+		L.mapbox.accessToken = 'pk.eyJ1IjoiZmJhcnJpb3MxIiwiYSI6Ik1KMVB5clUifQ.Z6_UiuwrpouEJW7ZEPwmdA';
+
+		var map = L.mapbox.map('map', 'fbarrios1.liae73l6')
+		.setView([30,31],1);
+
+		function getJSON(url) {
+
+        	var resp ;
+        	var xmlHttp ;
+
+        	resp  = '' ;
+        	xmlHttp = new XMLHttpRequest();
+
+        	if(xmlHttp != null)
+        	{
+            	xmlHttp.open( "GET", url, false );
+            	xmlHttp.send( null );
+            	resp = xmlHttp.responseText;
+        	}
+
+        	return resp ;
+    	}
+    	
+    	var x = getJSON("https://api.myjson.com/bins/10w05")
+    	var json = JSON.parse(x)
+    	points=[];
+    	lineas=[];
+    	lineas2=[];
+
+		function funcion_click() {
+			
+			for (i=0;i<points.length;i++) {
+  				map.removeLayer(points[i]);
+			}
+			
+			for (i=0; i<lineas.length; i++){
+				map.removeLayer(lineas[i]);
+			}
+
+			for (i=0; i<lineas2.length; i++){
+				map.removeLayer(lineas2[i]);
+			}
+
+    		var e = document.getElementById("seleccion");
+    		var numero_user = e.options[e.selectedIndex].value;
+    		var checkbox = document.getElementById("lifecheck").checked;
+
+    		var input_ini = document.getElementById("fechai").value;
+    		var fecha_ini = input_ini.split("-");
+    		
+    		var input_fin = document.getElementById("fechaf").value;
+    		var fecha_fin = input_fin.split("-");
+
+			function buscar_indice(objeto, id ,valor) {
+ 			
+				for (var i = 0; i < objeto.length; i++) {
+ 
+				if (objeto[i][id] == valor) {
+				return i;
+				}
+				}
+				return null;
+			}
+
+			var indice = buscar_indice(json.usuarios, "id" , numero_user);	
+			var coord = [];
+
+			for (k = 0; k < json.usuarios[indice].check_ins.length;	 k++) {
+				
+				var tf = json.usuarios[indice].check_ins[k].time;
+   				var fecha_tiempo = tf.split(" ");
+    			var fechaa = fecha_tiempo[0].split("-");
+				
+				if ((fecha_ini[0]<fechaa[0] && fecha_fin[0]>fechaa[0])||(fecha_ini[0]==fechaa[0] && fecha_ini[1]<fechaa[1] && fecha_fin[0]>fechaa[0])||(fecha_ini[0]==fechaa[0] && fecha_ini[1]==fechaa[1] && fecha_ini[2]<=fechaa[2] && fecha_fin[0]>fechaa[0])||(fecha_ini[0]<fechaa[0] && fecha_fin[0]==fechaa[0] && fecha_fin[1]>fechaa[1])||(fecha_ini[0]<fechaa[0] && fecha_fin[0]==fechaa[0] && fecha_fin[1]==fechaa[1] && fecha_fin[2]>=fechaa[2]) || (fecha_ini[0]==fechaa[0] && fecha_fin[0]==fechaa[0] && fecha_ini[1]<fechaa[1] && fecha_fin[1]>fechaa[1]) || ( fecha_ini[0]==fechaa[0] && fecha_fin[0]==fechaa[0] && fecha_ini[1]==fechaa[1] && fecha_fin[1]==fechaa[1] && fecha_ini[2]<=fechaa[2] && fecha_fin[2]>=fechaa[2]) || (fecha_ini[0]==fechaa[0] && fecha_fin[0]==fechaa[0] && fecha_ini[1]==fechaa[1] && fecha_fin[1]>fechaa[1] && fecha_ini[2]<=fechaa[2]) || (fecha_ini[0]==fechaa[0] && fecha_fin[0]==fechaa[0] && fecha_ini[1]<fechaa[1] && fecha_fin[1]==fechaa[1] && fecha_fin[2]>=fechaa[2]) || (input_ini=="" && input_fin=="")) {
+
+					var latt = json.usuarios[indice].check_ins[k].latitude;
+   					var lonn = json.usuarios[indice].check_ins[k].longitude;
+   					var point = L.marker([latt, lonn]).addTo(map);
+					points.push(point);	
+					coord[coord.length] = [latt,lonn];
+
+    				var polylines = L.polyline([],{color: '#F8283D'}).addTo(map);
+					for (f = 0; f < coord.length;	 f++) {
+						var poli = polylines.addLatLng(coord[f]);
+						lineas2.push(poli);
+					}
+
+			}}	
+
+			if (checkbox == true) {
+				for (j = 0; j < json.usuarios[indice].amigos.length; j++) {
+					var coord2=[];
+					for (i = 0; i < json.usuarios[indice].amigos[j].check_ins.length;	 i++) {
+						var tff = json.usuarios[indice].amigos[j].check_ins[i].time;
+   						var fecha_tiempoo = tff.split(" ");
+    					var fechaaa = fecha_tiempoo[0].split("-");
+
+    					if ((fecha_ini[0]<fechaaa[0] && fecha_fin[0]>fechaaa[0])||(fecha_ini[0]==fechaaa[0] && fecha_ini[1]<fechaaa[1] && fecha_fin[0]>fechaaa[0])||(fecha_ini[0]==fechaaa[0] && fecha_ini[1]==fechaaa[1] && fecha_ini[2]<=fechaaa[2] && fecha_fin[0]>fechaaa[0])||(fecha_ini[0]<fechaaa[0] && fecha_fin[0]==fechaaa[0] && fecha_fin[1]>fechaaa[1])||(fecha_ini[0]<fechaaa[0] && fecha_fin[0]==fechaaa[0] && fecha_fin[1]==fechaaa[1] && fecha_fin[2]>=fechaaa[2]) || (fecha_ini[0]==fechaaa[0] && fecha_fin[0]==fechaaa[0] && fecha_ini[1]<fechaaa[1] && fecha_fin[1]>fechaaa[1]) || ( fecha_ini[0]==fechaaa[0] && fecha_fin[0]==fechaaa[0] && fecha_ini[1]==fechaaa[1] && fecha_fin[1]==fechaaa[1] && fecha_ini[2]<=fechaaa[2] && fecha_fin[2]>=fechaaa[2]) || (fecha_ini[0]==fechaaa[0] && fecha_fin[0]==fechaaa[0] && fecha_ini[1]==fechaaa[1] && fecha_fin[1]>fechaaa[1] && fecha_ini[2]<=fechaaa[2]) || (fecha_ini[0]==fechaaa[0] && fecha_fin[0]==fechaaa[0] && fecha_ini[1]<fechaaa[1] && fecha_fin[1]==fechaaa[1] && fecha_fin[2]>=fechaaa[2]) || (input_ini=="" && input_fin=="") ) {
+  		
+    						var lat = json.usuarios[indice].amigos[j].check_ins[i].latitude;
+   							var lon = json.usuarios[indice].amigos[j].check_ins[i].longitude;
+    						var point = L.marker([lat, lon]).addTo(map);
+							points.push(point);
+							coord2[coord2.length] = [lat,lon];
+
+						var polyline = L.polyline([],{color: '#226052'}).addTo(map);
+						for (x = 0; x < coord2.length;	 x++) {
+							var polii = polyline.addLatLng(coord2[x]);
+							lineas.push(polii);
+						}
+						
+
+					}}
+				}
+			}	
+		}
+		
+		 </script>
+</body>
+</html>
+
