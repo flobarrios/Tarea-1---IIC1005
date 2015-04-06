@@ -1,4 +1,6 @@
-Tarea 1 IIC1005 - Florencia Barrios Algunas consideraciones:
+Tarea 1 IIC1005 - Florencia Barrios
+
+Algunas consideraciones:
 
 - Para importar el json se utilizó el código de la siguiente pagina:
 http://stackoverflow.com/questions/19440589/parsing-json-data-from-a-url
